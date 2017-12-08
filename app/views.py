@@ -1,8 +1,7 @@
 from flask import render_template, request, jsonify
 from app import app, db
-from app.models import Point
+from app.models import TestPoint
 from app.ai import *
-import geopy, geopy.distance
 
 
 @app.route('/')
@@ -46,7 +45,7 @@ def api():
 
         # look for points that are farther from the road
         current = starting_point
-        for i in range(10):
+        for i in range(5):
             next_point = ai.findNextPoint(current)
 
             if next_point.geo.latitude == current.geo.latitude and next_point.geo.longitude == current.geo.longitude:
@@ -57,3 +56,13 @@ def api():
             current = next_point
 
     return jsonify(points)
+
+
+@app.route('/api/points')
+def api_points():
+    pts = TestPoint.query.filter(TestPoint.distance.isnot(None)).order_by(TestPoint.distance.desc()).limit(100)
+    json_points = []
+    for pt in pts:
+        json_points.append(pt.to_json())
+
+    return jsonify(json_points)

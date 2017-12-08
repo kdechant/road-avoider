@@ -3,7 +3,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
     center: [-122.667918, 45.522127],
-    zoom: 11,
+    zoom: 6,
 });
 var el = document.createElement('div');
 el.className = 'marker';
@@ -82,3 +82,68 @@ var popup = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false
 });
+
+map.on('load', function () {
+
+    $.get('/api/points', function (data) {
+        let features = [];
+        for (const pt of data) {
+            features.push({
+                'id': 'point' + pt.id,
+                'type': 'Feature',
+                'properties': {
+                    'id': 'marker' + pt.id,
+                    'title': pt.lat + ", " + pt.lng,
+                    'distance': pt.distance,
+                },
+                'geometry': {
+                    'coordinates': [pt.lng, pt.lat],
+                    'type': 'Point'
+                }
+            });
+        }
+        console.log(features);
+        map.addLayer({
+            id: 'points',
+            type: 'circle',
+            source: {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': features
+                }
+            },
+            'paint': {
+                'circle-radius': {
+                    property: 'distance',
+                    type: 'exponential',
+                    stops: [
+                        [0, 1],
+                        [100000, 20]
+                    ]
+                },
+                'circle-color': {
+                    property: 'distance',
+                    type: 'exponential',
+                    stops: [
+                      [15000, '#ffffff'],
+                      [75000, '#0000ff']
+                    ]
+                }
+            },
+        });
+        map.on('mouseenter', 'points', function (e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(e.lngLat)
+                .setHTML("<p><b>Distance from nearest road:</b> " + (e.features[0].properties.distance / 5280).toFixed(2) + " miles</p>")
+                .addTo(map);
+        });
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    });
+})

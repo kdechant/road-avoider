@@ -2,6 +2,23 @@ from app import db
 import geopy, geopy.distance
 
 
+class TestPoint(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lat = db.Column(db.Float, index=True)
+    lng = db.Column(db.Float, index=True)
+    distance = db.Column(db.Float)
+
+    def __repr__(self):
+        return '<TestPoint {}, {}>'.format(self.lat, self.lng)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'lat': self.lat,
+            'lng': self.lng,
+            'distance': self.distance,
+        }
+
 class Point:
 
     base_sql = """
