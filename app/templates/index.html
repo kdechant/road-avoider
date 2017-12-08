@@ -1,13 +1,47 @@
 <html>
-  <head>
+<head>
     <title>Map Project</title>
-  </head>
-  <body>
-    <h1>Map of {{ place }}</h1>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet'/>
+</head>
+<body>
+<h1>Map of {{ place }}</h1>
 
+<div id="map" style="width: 900px; height: 600px;"></div>
+
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js'></script>
+<script type="text/javascript">
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VtaW5pY2EiLCJhIjoiNjM5ZjdkNDI0OWZkNGVmMzJlZGUwZjFlYTNkZjU4NGYifQ.BMp74b7SVszf66pxAP_tSg';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        center: [-122.67, 45.52],
+        zoom: 10,
+        style: 'mapbox://styles/mapbox/streets-v9'
+    });
+
+    var coords = [];
     {% for point in points %}
-    <p>{{ point['geo'].latitude }}, {{ point['geo'].longitude }}, {{ point['distance'] }} ft,  {{ point['direction'] }} deg</p>
+    coords.push([{{ point['geo'].longitude }}, {{ point['geo'].latitude }}]);
     {% endfor %}
 
-  </body>
+    map.on("load", function () {
+        map.addLayer({
+            id: 'linetest',
+            type: "line",
+            source: {
+                'type': 'geojson',
+                data: {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: coords
+                    }
+                }
+            }
+        });
+    });
+
+</script>
+</body>
 </html>
