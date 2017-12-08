@@ -26,6 +26,7 @@ class Point:
         self.geo = geopy.Point(latitude=lat, longitude=lon)
         self.distance = 0
         self.direction = 0
+        self.find_nearest_road()
 
     def __str__(self):
         return str(self.geo.latitude) + ", " + str(self.geo.longitude)
@@ -69,7 +70,6 @@ class Point:
         if not self.is_in_bounds():
             print("point " + str(self) + " is out of bounds")
             return False
-        self.find_nearest_road()
         if self.distance > other_point.distance:
             print("new point " + str(self) + " is better than " + str(other_point))
             return True
