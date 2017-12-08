@@ -20,6 +20,9 @@ class SimpleAI(BaseAI):
         print("moving in simple direction: " + str(current.direction + 180))
         new_latlng = self.mover.destination(current.geo, bearing=current.direction + 180)
         new_point = Point(new_latlng.latitude, new_latlng.longitude)
+        if not new_point.is_in_bounds():
+            print("point " + str(new_point) + " is out of bounds")
+            return current
         return new_point
 
 
@@ -29,11 +32,9 @@ class SpreadAI(BaseAI):
     def findNextPoint(self, current):
         best_point = current
         new_points = [
-            self.mover.destination(current.geo, bearing=current.direction + 90),
             self.mover.destination(current.geo, bearing=current.direction + 135),
             self.mover.destination(current.geo, bearing=current.direction + 180),
-            self.mover.destination(current.geo, bearing=current.direction + 225),
-            self.mover.destination(current.geo, bearing=current.direction + 270)
+            self.mover.destination(current.geo, bearing=current.direction + 225)
         ]
         for p in new_points:
             pt = Point(p.latitude, p.longitude)

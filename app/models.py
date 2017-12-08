@@ -31,6 +31,14 @@ class Point:
     def __str__(self):
         return str(self.geo.latitude) + ", " + str(self.geo.longitude)
 
+    def to_json(self):
+        return {
+            'lat': self.geo.latitude,
+            'lng': self.geo.longitude,
+            'distance': self.distance,
+            'direction': self.direction
+        }
+
     def find_nearest_road(self):
         sql = self.base_sql.format(**{'lat': self.geo.latitude, "lon": self.geo.longitude, "limit": 1})
         result = db.engine.execute(sql)

@@ -1,52 +1,37 @@
 <html>
 <head>
-    <title>Map Project</title>
+    <title>Don't Fence Me In</title>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet'/>
+    <style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    .marker {
+        background-image: url('static/metaltoad.jpg');
+        background-size: cover;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<h1>Map of {{ place }}</h1>
+<h1>Don't Fence Me In</h1>
 
-<div id="map" style="width: 900px; height: 600px;"></div>
+<div id="map"></div>
 
+<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js'></script>
-<script type="text/javascript">
-
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VtaW5pY2EiLCJhIjoiNjM5ZjdkNDI0OWZkNGVmMzJlZGUwZjFlYTNkZjU4NGYifQ.BMp74b7SVszf66pxAP_tSg';
-    var map = new mapboxgl.Map({
-        container: 'map',
-        center: [-122.67, 45.52],
-        zoom: 10,
-        style: 'mapbox://styles/mapbox/streets-v9'
-    });
-
-    map.on("load", function () {
-        {% for ai_name, coords in points.items() %}
-        map.addLayer({
-            id: '{{ ai_name }}',
-            type: "line",
-            paint: {
-                "line-color": "#cc3333",
-                "line-width": 5
-            },
-            source: {
-                'type': 'geojson',
-                data: {
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: [
-                            {% for pt in coords %}
-                                [{{ pt['geo'].longitude}}, {{ pt['geo'].latitude}}],
-                            {% endfor %}
-                        ]
-                    }
-                }
-            }
-        });
-        {% endfor %}
-    });
-
-</script>
+<script src='static/app.js'></script>
 </body>
 </html>
