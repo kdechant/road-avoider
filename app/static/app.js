@@ -3,11 +3,9 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
     center: [-122.667918, 45.522127],
-    zoom: 6,
+    zoom: 10,
 });
-var el = document.createElement('div');
-el.className = 'marker';
-var marker = new mapboxgl.Marker(el).setLngLat([0,0]).addTo(map);
+var el, marker;
 
 var colors = [
     "#cc3333",
@@ -23,6 +21,9 @@ map.on('click', function(e) {
     //note we use the pixel location (e.point) and not lat/lon here.
     //also specify the feature we want to pay attention
     //to - 'academic_positions'
+    el = document.createElement('div');
+    el.className = 'marker';
+    marker = new mapboxgl.Marker(el).setLngLat([0,0]).addTo(map);
     marker.setLngLat(e.lngLat);
 
     $.get('/api?lat=' + e.lngLat.lat + '&lng=' + e.lngLat.lng, function (data) {
@@ -87,7 +88,7 @@ map.on('load', function () {
 
     $.get('/api/points', function (data) {
         let features = [];
-        for (const pt of data) {
+        for (const pt of data.reverse()) {
             features.push({
                 'id': 'point' + pt.id,
                 'type': 'Feature',
@@ -102,7 +103,6 @@ map.on('load', function () {
                 }
             });
         }
-        console.log(features);
         map.addLayer({
             id: 'points',
             type: 'circle',
@@ -126,7 +126,7 @@ map.on('load', function () {
                     property: 'distance',
                     type: 'exponential',
                     stops: [
-                      [15000, '#ffffff'],
+                      [10000, '#cccccc'],
                       [75000, '#0000ff']
                     ]
                 }

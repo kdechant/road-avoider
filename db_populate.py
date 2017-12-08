@@ -14,13 +14,21 @@ from app.models import TestPoint
 # SW 43.8276, -122.179
 # NE 44.2914,-121.6365
 
-lat1 = 4383
-lat2 = 4429
-lng1 = -12218
-lng2 = -12164
+# kalmiopsis wilderness
+# sw 42.0325,-124.0865
+# ne 42.4427,-123.8132
 
-for lat in range(lat1, lat2, 5):
-    for lng in range(lng1, lng2, 5):
+# diablo mountain area
+# sw 42.7500,-120.6560
+# ne 43.1771,-120.0394
+
+lat1 = 4275
+lng1 = -12062
+lat2 = 4318
+lng2 = -12000
+
+for lat in range(lat1, lat2, 7):
+    for lng in range(lng1, lng2, 7):
         print("{}, {}".format(lat / 100, lng / 100))
         p = TestPoint()
         p.lat = lat / 100
