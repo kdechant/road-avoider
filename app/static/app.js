@@ -39,8 +39,9 @@ map.on('click', function(e) {
                     max_dist_point = [pt.lng, pt.lat];
                 }
             }
+            let id = e.lngLat.lat + "_" + e.lngLat.lng + "_" + key;
             map.addLayer({
-                id: e.lngLat.lat + "_" + e.lngLat.lng + "_" + key,
+                id: id,
                 type: 'line',
                 paint: {
                     "line-color": colors[color_index++],
@@ -58,6 +59,19 @@ map.on('click', function(e) {
                     }
                 }
             });
+            map.on('mouseenter', id, function (e) {
+                // Change the cursor style as a UI indicator.
+                map.getCanvas().style.cursor = 'pointer';
+                // Populate the popup and set its coordinates
+                // based on the feature found.
+                popup.setLngLat(e.lngLat)
+                    .setHTML("<p><b>Distance traveled:</b> " + turf.length(e.features[0].geometry, {"unit": "miles"}).toFixed(3) + " miles</p>")
+                    .addTo(map);
+            });
+            map.on('mouseleave', id, function () {
+                map.getCanvas().style.cursor = '';
+                popup.remove();
+            });
         }
         // move the marker to the best point we found
         marker.setLngLat(max_dist_point);
@@ -67,18 +81,4 @@ map.on('click', function(e) {
 var popup = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false
-});
-map.on('mouseenter', 'routes', function(e) {
-    console.log('enter');
-    // Change the cursor style as a UI indicator.
-    map.getCanvas().style.cursor = 'pointer';
-    // Populate the popup and set its coordinates
-    // based on the feature found.
-    popup.setLngLat(e.lngLat)
-        .setHTML("<p><b>Distance traveled:</b> " + turf.length(e.features[0].geometry, {"unit":"miles"}).toFixed(3) + " miles</p>")
-        .addTo(map);
-});
-map.on('mouseleave', 'routes', function() {
-    map.getCanvas().style.cursor = '';
-    popup.remove();
 });
