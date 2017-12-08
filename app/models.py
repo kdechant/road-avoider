@@ -70,13 +70,13 @@ class Point:
     def is_better_than(self, other_point):
         """
         Determines if this point (self) is valid and is in a better position than another point (other_point)
-        :param pt: Another Point object, which will be compared to this one
+        :param other_point: Point Another Point object, which will be compared to this one
         :return: boolean True if this point is valid and farther away than the other point. False otherwise.
         """
         # if not self.is_in_bounds():
         #     print("point " + str(self) + " is out of bounds")
         #     return False
-        if self.distance > other_point.distance:
+        if self.distance > other_point.distance * 0.95:
             print("new point " + str(self) + " is better than " + str(other_point))
             return True
         else:
