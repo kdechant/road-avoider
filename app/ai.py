@@ -32,14 +32,19 @@ class SpreadAI(BaseAI):
     def findNextPoint(self, current):
         best_point = current
         new_points = [
+            self.mover.destination(current.geo, bearing=current.direction + 90),
             self.mover.destination(current.geo, bearing=current.direction + 135),
             self.mover.destination(current.geo, bearing=current.direction + 180),
-            self.mover.destination(current.geo, bearing=current.direction + 225)
+            self.mover.destination(current.geo, bearing=current.direction + 225),
+            self.mover.destination(current.geo, bearing=current.direction + 270)
         ]
         for p in new_points:
-            pt = Point(p.latitude, p.longitude)
-            if pt.is_better_than(best_point):
-                best_point = pt
+            new_point = Point(p.latitude, p.longitude)
+            if not new_point.is_in_bounds():
+                print("point " + str(new_point) + " is out of bounds")
+                continue
+            if new_point.is_better_than(best_point):
+                best_point = new_point
 
         return best_point
 
@@ -53,7 +58,10 @@ class WeightedAI(BaseAI):
         new_latlng = self.mover.destination(current.geo, bearing=new_dir)
 
         new_point = Point(new_latlng.latitude, new_latlng.longitude)
-        if new_point.is_better_than(current):
-            return new_point
-        else:
+        if not new_point.is_in_bounds():
+            print("point " + str(new_point) + " is out of bounds")
             return current
+        # if new_point.is_better_than(current):
+        return new_point
+        # else:
+        #     return current

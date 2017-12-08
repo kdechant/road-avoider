@@ -57,8 +57,6 @@ class Point:
         direction = []
         i = 0
         for row in result:
-            print(row['distance'])
-            print(row['azimuth'])
             distance.append(round(row['distance'],1))
             direction.append(round(row['azimuth'],1))
             i += 1
@@ -75,9 +73,9 @@ class Point:
         :param pt: Another Point object, which will be compared to this one
         :return: boolean True if this point is valid and farther away than the other point. False otherwise.
         """
-        if not self.is_in_bounds():
-            print("point " + str(self) + " is out of bounds")
-            return False
+        # if not self.is_in_bounds():
+        #     print("point " + str(self) + " is out of bounds")
+        #     return False
         if self.distance > other_point.distance:
             print("new point " + str(self) + " is better than " + str(other_point))
             return True
@@ -95,8 +93,9 @@ class Point:
             ST_Transform(way, 4326)
         ) as intersects
         from planet_osm_polygon
-        where admin_level = '8' and name = 'Portland'
+        where admin_level = '4'
         """
+        # where admin_level = '4' and name = 'Portland'
         in_bounds = False
         result = db.engine.execute(sql.format(**{'lat': self.geo.latitude, "lon": self.geo.longitude}))
         for row in result:

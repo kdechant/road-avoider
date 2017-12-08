@@ -35,7 +35,7 @@ def api():
 
     ais = [
         SimpleAI(),
-        # SpreadAI(),
+        SpreadAI(),
         WeightedAI()
     ]
     points = {}
@@ -46,7 +46,7 @@ def api():
 
         # look for points that are farther from the road
         current = starting_point
-        for i in range(15):
+        for i in range(10):
             next_point = ai.findNextPoint(current)
 
             if next_point.geo.latitude == current.geo.latitude and next_point.geo.longitude == current.geo.longitude:

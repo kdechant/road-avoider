@@ -7,6 +7,7 @@ var map = new mapboxgl.Map({
 });
 var el = document.createElement('div');
 el.className = 'marker';
+var marker = new mapboxgl.Marker(el).setLngLat([0,0]).addTo(map);
 
 var colors = [
     "#cc3333",
@@ -22,16 +23,21 @@ map.on('click', function(e) {
     //note we use the pixel location (e.point) and not lat/lon here.
     //also specify the feature we want to pay attention
     //to - 'academic_positions'
-    new mapboxgl.Marker(el).setLngLat(e.lngLat).addTo(map);
-    var params = [e.lngLat, map.getZoom()];
-    console.log(params)
+    marker.setLngLat(e.lngLat);
 
     $.get('/api?lat=' + e.lngLat.lat + '&lng=' + e.lngLat.lng, function (data) {
         color_index = 0;
+        var max_dist = 0;
+        var max_dist_point = [e.lngLat.lng, e.lngLat.lat];
         for (const key in data) {
+            var d = data[key];
             coords = [];
-            for (const i in data[key]) {
-                coords.push([data[key][i].lng, data[key][i].lat]);
+            for (const pt of d) {
+                coords.push([pt.lng, pt.lat]);
+                if (pt.distance > max_dist) {
+                    max_dist = pt.distance;
+                    max_dist_point = [pt.lng, pt.lat];
+                }
             }
             map.addLayer({
                 id: e.lngLat.lat + "_" + e.lngLat.lng + "_" + key,
@@ -51,8 +57,10 @@ map.on('click', function(e) {
                         }
                     }
                 }
-            })
+            });
         }
+        // move the marker to the best point we found
+        marker.setLngLat(max_dist_point);
     });
 
 });
@@ -60,16 +68,17 @@ var popup = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false
 });
-// map.on('mouseenter', 'routes', function(e) {
-//     // Change the cursor style as a UI indicator.
-//     map.getCanvas().style.cursor = 'pointer';
-//     // Populate the popup and set its coordinates
-//     // based on the feature found.
-//     popup.setLngLat(e.lngLat)
-//         .setHTML("<p><b>Distance traveled:</b> " + turf.length(e.features[0].geometry, {"unit":"miles"}).toFixed(3) + " miles</p>")
-//         .addTo(map);
-// });
-// map.on('mouseleave', 'routes', function() {
-//     map.getCanvas().style.cursor = '';
-//     popup.remove();
-// });
+map.on('mouseenter', 'routes', function(e) {
+    console.log('enter');
+    // Change the cursor style as a UI indicator.
+    map.getCanvas().style.cursor = 'pointer';
+    // Populate the popup and set its coordinates
+    // based on the feature found.
+    popup.setLngLat(e.lngLat)
+        .setHTML("<p><b>Distance traveled:</b> " + turf.length(e.features[0].geometry, {"unit":"miles"}).toFixed(3) + " miles</p>")
+        .addTo(map);
+});
+map.on('mouseleave', 'routes', function() {
+    map.getCanvas().style.cursor = '';
+    popup.remove();
+});
