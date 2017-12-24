@@ -45,7 +45,7 @@ def api():
 
         # look for points that are farther from the road
         current = starting_point
-        for i in range(12):
+        for i in range(10):
             next_point = ai.findNextPoint(current)
 
             if next_point.geo.latitude == current.geo.latitude and next_point.geo.longitude == current.geo.longitude:
@@ -60,7 +60,7 @@ def api():
 
 @app.route('/api/points')
 def api_points():
-    pts = TestPoint.query.filter(TestPoint.distance.isnot(None)).order_by(TestPoint.distance.desc()).limit(150)
+    pts = TestPoint.query.filter(TestPoint.distance_track.isnot(None), TestPoint.excluded==False).order_by(TestPoint.distance_track.desc()).limit(150)
     json_points = []
     for pt in pts:
         json_points.append(pt.to_json())

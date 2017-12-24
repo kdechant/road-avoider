@@ -22,13 +22,17 @@ from app.models import TestPoint
 # sw 42.7500,-120.6560
 # ne 43.1771,-120.0394
 
-lat1 = 4275
-lng1 = -12062
-lat2 = 4318
-lng2 = -12000
+# whole state
+# sw: 42.0, -124.5
+# ne: 46.25, -116.46
 
-for lat in range(lat1, lat2, 7):
-    for lng in range(lng1, lng2, 7):
+lat1 = 4200
+lng1 = -12450
+lat2 = 4625
+lng2 = -11646
+
+for lat in range(lat1, lat2, 2):
+    for lng in range(lng1, lng2, 2):
         print("{}, {}".format(lat / 100, lng / 100))
         p = TestPoint()
         p.lat = lat / 100

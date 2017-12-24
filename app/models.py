@@ -7,6 +7,11 @@ class TestPoint(db.Model):
     lat = db.Column(db.Float, index=True)
     lng = db.Column(db.Float, index=True)
     distance = db.Column(db.Float)
+    distance_major = db.Column(db.Float)
+    distance_track = db.Column(db.Float)
+    state = db.Column(db.String)
+    excluded = db.Column(db.Boolean)
+    exclude_reason = db.Column(db.Integer)
 
     def __repr__(self):
         return '<TestPoint {}, {}>'.format(self.lat, self.lng)
@@ -16,7 +21,7 @@ class TestPoint(db.Model):
             'id': self.id,
             'lat': self.lat,
             'lng': self.lng,
-            'distance': self.distance,
+            'distance': self.distance_track,
         }
 
 class Point:
