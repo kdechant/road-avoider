@@ -11,8 +11,13 @@ from app.models import TestPoint
 # 44.50,-121.68
 
 # three sisters wilderness area
-# SW 43.8276, -122.179
-# NE 44.2914,-121.6365
+# SW 43.827, -122.179
+# NE 44.291,-121.636
+
+lat1 = 43800
+lng1 = -122200
+lat2 = 44300
+lng2 = -121500
 
 # kalmiopsis wilderness
 # sw 42.0325,-124.0865
@@ -26,16 +31,21 @@ from app.models import TestPoint
 # sw: 42.0, -124.5
 # ne: 46.25, -116.46
 
-lat1 = 4200
-lng1 = -12450
-lat2 = 4625
-lng2 = -11646
+# wallowas 1
+# sw: 45.12 -117.44
+# ne: 45.18 -117.22
+#
+lat1 = 45121
+lng1 = -117441
+lat2 = 45181
+lng2 = -117221
 
-for lat in range(lat1, lat2, 2):
-    for lng in range(lng1, lng2, 2):
-        print("{}, {}".format(lat / 100, lng / 100))
+for lat in range(lat1, lat2, 5):
+    for lng in range(lng1, lng2, 5):
+        print("{}, {}".format(lat / 1000, lng / 1000))
         p = TestPoint()
-        p.lat = lat / 100
-        p.lng = lng / 100
+        p.lat = lat / 1000
+        p.lng = lng / 1000
+        p.excluded = False
         db.session.add(p)
         db.session.commit()

@@ -118,16 +118,16 @@ map.on('load', function () {
                     property: 'distance',
                     type: 'exponential',
                     stops: [
-                        [0, 1],
-                        [100000, 20]
+                        [30000, 1],
+                        [40000, 15]
                     ]
                 },
                 'circle-color': {
                     property: 'distance',
                     type: 'exponential',
                     stops: [
-                      [10000, '#cccccc'],
-                      [75000, '#0000ff']
+                      [30000, '#cccccc'],
+                      [40000, '#0000ff']
                     ]
                 }
             },
@@ -138,7 +138,7 @@ map.on('load', function () {
             // Populate the popup and set its coordinates
             // based on the feature found.
             popup.setLngLat(e.lngLat)
-                .setHTML("<p><b>Distance from nearest road:</b> " + (e.features[0].properties.distance / 5280).toFixed(2) + " miles</p>")
+                .setHTML("<p>" + e.features[0].properties.title + "</p><p><b>Distance from nearest road:</b> " + (e.features[0].properties.distance / 5280).toFixed(2) + " miles</p>")
                 .addTo(map);
         });
         map.on('mouseleave', 'points', function () {

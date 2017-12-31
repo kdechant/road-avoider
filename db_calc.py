@@ -92,7 +92,7 @@ for i in range(0,1000):
                 p.distance_track = round(row['distance'], 1)
                 print(str(p.distance_track) + " ft")
 
-                if p.distance_track < 3000:
+                if p.distance_track < 5000:
                     # for oregon/washington, we don't care about points < 2 mi
                     # from a road; if this point is close to a road, exclude
                     # any points within a mile of it (to save processing time)

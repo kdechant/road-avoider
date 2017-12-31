@@ -22,16 +22,6 @@ def api():
     for row in result:
         place = row['name']
 
-    # set the starting point. Currently hard-coded but will eventually come from the front end via API call
-    # starting_point = Point(45.51973, -122.67685),    # MT office
-    # starting_point = Point(45.475835, -122.685968)    # SW Portland near I-5 curve
-    # starting_point = Point(45.51063, -122.59734),     # Mount Tabor
-    # starting_point = Point(45.5393, -122.4971)       # outer east side near gresham border - for testing edge detection
-    # point = Point(45.51973, -122.67685)     # MT office
-    # point = Point(45.51063, -122.59734)     # Mount Tabor
-    # point = Point(45.51137, -122.69621)     # SW Portland
-    # point = Point(45.44124, -122.75212)       # far SW Portland
-
     ais = [
         SimpleAI(),
         SpreadAI(),
@@ -60,7 +50,7 @@ def api():
 
 @app.route('/api/points')
 def api_points():
-    pts = TestPoint.query.filter(TestPoint.distance_track.isnot(None), TestPoint.excluded==False).order_by(TestPoint.distance_track.desc()).limit(150)
+    pts = TestPoint.query.filter(TestPoint.distance_track.isnot(None), TestPoint.excluded==False).order_by(TestPoint.distance_track.desc()).limit(500)
     json_points = []
     for pt in pts:
         json_points.append(pt.to_json())
