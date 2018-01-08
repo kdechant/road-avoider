@@ -2,7 +2,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VtaW5pY2EiLCJhIjoiNjM5ZjdkNDI0OWZkNGVmMzJlZ
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
-    center: [-122.667918, 45.522127],
+    center: [-123, 47.75],
     zoom: 10,
 });
 var el, marker;
@@ -118,16 +118,17 @@ map.on('load', function () {
                     property: 'distance',
                     type: 'exponential',
                     stops: [
-                        [30000, 1],
-                        [40000, 15]
+                        [25000, 4],
+                        [70000, 12]
                     ]
                 },
                 'circle-color': {
                     property: 'distance',
                     type: 'exponential',
                     stops: [
-                      [30000, '#cccccc'],
-                      [40000, '#0000ff']
+                      [25000, '#999999'],
+                      [50000, '#00ccff'],
+                      [75000, '#0000ff']
                     ]
                 }
             },
@@ -138,7 +139,7 @@ map.on('load', function () {
             // Populate the popup and set its coordinates
             // based on the feature found.
             popup.setLngLat(e.lngLat)
-                .setHTML("<p>" + e.features[0].properties.title + "</p><p><b>Distance from nearest road:</b> " + (e.features[0].properties.distance / 5280).toFixed(2) + " miles</p>")
+                .setHTML("<p>" + e.features[0].properties.title + "</p><p><b>Distance from nearest road:</b> " + (e.features[0].properties.distance / 5280).toFixed(3) + " miles</p>")
                 .addTo(map);
         });
         map.on('mouseleave', 'points', function () {

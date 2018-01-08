@@ -23,9 +23,9 @@ def api():
         place = row['name']
 
     ais = [
-        SimpleAI(),
+        # SimpleAI(),
         SpreadAI(),
-        WeightedAI()
+        # WeightedAI()
     ]
     points = {}
 
@@ -35,22 +35,35 @@ def api():
 
         # look for points that are farther from the road
         current = starting_point
-        for i in range(10):
+        for i in range(15):
             next_point = ai.findNextPoint(current)
 
             if next_point.geo.latitude == current.geo.latitude and next_point.geo.longitude == current.geo.longitude:
-                print("We're at the best point this AI can find")
-                break
+                # print("We're at the best point this AI can find")
+                ai.move_dist = ai.move_dist / 2
+                ai.makeMover()
+                print("No better point. Trying smaller steps. Move = " + str(ai.move_dist) + " ft")
+                continue
 
             points[ai.name].append(next_point.to_json())
+            print ("now at " + str(next_point))
             current = next_point
+
+        pt = TestPoint()
+        pt.lat = current.geo.latitude
+        pt.lng = current.geo.longitude
+        pt.distance_track = current.distance
+        pt.excluded = False
+        pt.exclude_reason = -1
+        db.session.add(pt)
+        db.session.commit()
 
     return jsonify(points)
 
 
 @app.route('/api/points')
 def api_points():
-    pts = TestPoint.query.filter(TestPoint.distance_track.isnot(None), TestPoint.excluded==False).order_by(TestPoint.distance_track.desc()).limit(500)
+    pts = TestPoint.query.filter(TestPoint.distance_track.isnot(None), TestPoint.excluded==False, TestPoint.distance_track>25000).order_by(TestPoint.distance_track.desc())
     json_points = []
     for pt in pts:
         json_points.append(pt.to_json())

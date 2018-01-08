@@ -2,6 +2,8 @@
 from app import db
 from app.models import TestPoint
 
+state_srid = 2285   # Washington (North)
+
 state_sql = """
 select name
 from planet_osm_polygon
@@ -26,23 +28,11 @@ where
 )
 """
 
-main_road_distance_sql = """
-select osm_id, name, highway, ref,
-  ST_Distance(
-   way2269,
-   ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), 2269)
- ) as distance
-from roads
-where highway in ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'road', 'service', 'unclassified', 'track', 'residential')
-order by distance
-limit 1
-"""
-
 road_distance_sql = """
 select osm_id, name, highway, ref,
   ST_Distance(
-   way2269,
-   ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), 2269)
+   way_local,
+   ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), {srid})
  ) as distance 
 from roads
 where highway in ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'road', 'service', 'unclassified', 'track', 'residential')
@@ -53,10 +43,10 @@ limit 1
 point_distance_sql = """
 UPDATE test_point set excluded = true, exclude_reason = 3
 WHERE distance_track IS NULL AND 
-ST_Distance(way, ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), 2269)) < 9000
+ST_Distance(way, ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), {srid})) < 9000
 """
 
-for i in range(0,1000):
+for i in range(0,13000):
     pts = TestPoint.query.filter(
         TestPoint.distance_track.is_(None),
         TestPoint.excluded == False
@@ -65,7 +55,7 @@ for i in range(0,1000):
         print(p)
 
         # find out which state it's in
-        sql = state_sql.format(**{'lat': p.lat, 'lon': p.lng})
+        sql = state_sql.format(**{'lat': p.lat, 'lon': p.lng, 'srid': state_srid})
         result = db.engine.execute(sql)
         for row in result:
             p.state = row['name'][:2]
@@ -77,28 +67,28 @@ for i in range(0,1000):
             p.exclude_reason = 1
 
         # exclude if it's in an incorporated city
-        sql = city_sql.format(**{'lat': p.lat, 'lon': p.lng})
+        sql = city_sql.format(**{'lat': p.lat, 'lon': p.lng, 'srid': state_srid})
         result = db.engine.execute(sql)
         for row in result:
-            print("is in " + row['name'])
+            # print("is in " + row['name'])
             p.excluded = True
             p.exclude_reason = 2
 
         if not p.excluded:
             # distance from any road
-            sql = road_distance_sql.format(**{'lat': p.lat, "lon": p.lng})
+            sql = road_distance_sql.format(**{'lat': p.lat, "lon": p.lng, 'srid': state_srid})
             result = db.engine.execute(sql)
             for row in result:
                 p.distance_track = round(row['distance'], 1)
                 print(str(p.distance_track) + " ft")
 
-                if p.distance_track < 5000:
-                    # for oregon/washington, we don't care about points < 2 mi
-                    # from a road; if this point is close to a road, exclude
-                    # any points within a mile of it (to save processing time)
-                    print("excluding nearby points")
-                    q = point_distance_sql.format(**{'lat': p.lat, "lon": p.lng})
-                    db.engine.execute(q)
+                # if p.distance_track < 5000:
+                #     # for oregon/washington, we don't care about points < 2 mi
+                #     # from a road; if this point is close to a road, exclude
+                #     # any points within a mile of it (to save processing time)
+                #     print("excluding nearby points")
+                #     q = point_distance_sql.format(**{'lat': p.lat, "lon": p.lng, 'srid': state_srid})
+                #     db.engine.execute(q)
 
         db.session.add(p)
         db.session.commit()

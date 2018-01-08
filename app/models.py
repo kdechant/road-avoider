@@ -7,7 +7,6 @@ class TestPoint(db.Model):
     lat = db.Column(db.Float, index=True)
     lng = db.Column(db.Float, index=True)
     distance = db.Column(db.Float)
-    distance_major = db.Column(db.Float)
     distance_track = db.Column(db.Float)
     state = db.Column(db.String)
     excluded = db.Column(db.Boolean)
@@ -30,16 +29,16 @@ class Point:
     select osm_id, name, highway, ref,
      ST_AsText(ST_Transform(ST_ClosestPoint(way, 'SRID=900913;POINT({lon} {lat})'::geometry), 4326)) as closest_point,
       ST_Distance(
-       ST_Transform(way,2269),
-       ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), 2269)
+       way_local,
+       ST_Transform(ST_GeomFromText('POINT({lon} {lat})',4326), 2285)
      ) as distance,
      degrees(ST_Azimuth(
       ST_GeomFromText('POINT({lon} {lat})', 4326),
       ST_ClosestPoint(ST_Transform(way,4326), ST_GeomFromText('POINT({lon} {lat})', 4326))
      )) as azimuth
-    from planet_osm_line
+    from roads
     where
-      highway in ('motorway')
+      highway in ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'road', 'service', 'unclassified', 'track', 'residential')
     order by distance
     limit {limit}
     """
@@ -51,7 +50,7 @@ class Point:
         self.find_nearest_road()
 
     def __str__(self):
-        return str(self.geo.latitude) + ", " + str(self.geo.longitude)
+        return str(self.geo.latitude) + ", " + str(self.geo.longitude) + ": " + str(self.distance)
 
     def to_json(self):
         return {
@@ -98,7 +97,7 @@ class Point:
         # if not self.is_in_bounds():
         #     print("point " + str(self) + " is out of bounds")
         #     return False
-        if self.distance > other_point.distance * 0.95:
+        if self.distance > other_point.distance:
             print("new point " + str(self) + " is better than " + str(other_point))
             return True
         else:
